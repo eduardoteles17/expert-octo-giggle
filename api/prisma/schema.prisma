@@ -11,7 +11,7 @@ datasource db {
 }
 
 model Device {
-  id   String @id @default(uuid())
-  name String
-  type String
+  id     String @id @default(uuid())
+  name   String
+  status String
 }
