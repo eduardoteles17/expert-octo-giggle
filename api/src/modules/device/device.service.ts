@@ -15,4 +15,25 @@ export class DeviceService {
       status: device.status as DeviceStatus,
     }));
   }
+
+  async toggleById(deviceId: string): Promise<Device> {
+    const device = await this.prismaService.device.findUnique({
+      where: { id: deviceId },
+    });
+
+    const toggledDevice = await this.prismaService.device.update({
+      where: { id: deviceId },
+      data: {
+        status:
+          device.status === DeviceStatus.active
+            ? DeviceStatus.inactive
+            : DeviceStatus.active,
+      },
+    });
+
+    return {
+      ...toggledDevice,
+      status: toggledDevice.status as DeviceStatus,
+    };
+  }
 }
