@@ -58,8 +58,6 @@ export class DeviceService {
       },
     });
 
-    await this.deviceGateway.sendStatus(deviceId, newStatus);
-
     return {
       ...toggledDevice,
       status: toggledDevice.status as DeviceStatus,
@@ -75,8 +73,6 @@ export class DeviceService {
       where: { id: deviceId },
       data: { status },
     });
-
-    await this.deviceGateway.sendStatus(deviceId, status);
 
     return {
       ...updatedDevice,
