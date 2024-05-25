@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/screens/home_screen.dart';
+import 'package:mobile/screens/splash_screen.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -11,7 +11,7 @@ class App extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
       ),
-      home: const HomeScreen(),
+        home: SplashScreen(),
     );
   }
 }
