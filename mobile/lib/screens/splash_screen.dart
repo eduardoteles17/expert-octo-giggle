@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:lottie/lottie.dart';
 
 import 'home_screen.dart';
@@ -11,15 +12,43 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  final LocalAuthentication auth = LocalAuthentication();
+
+  _navegarHome() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const HomeScreen(),
+      ),
+    );
+  }
+
   _initApp() async {
     await Future.delayed(const Duration(seconds: 3));
-    if (mounted) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const HomeScreen(),
-        ),
-      );
+    final bool canAuthenticateWithBiometrics = await auth.canCheckBiometrics;
+    final bool canAuthenticate =
+        canAuthenticateWithBiometrics || await auth.isDeviceSupported();
+
+    if (mounted && !canAuthenticate) {
+      _navegarHome();
+    }
+
+    if (mounted && canAuthenticate) {
+      try {
+        final isAuthenticated = await auth.authenticate(
+          localizedReason: 'Autentique-se para acessar o aplicativo',
+          options: const AuthenticationOptions(
+            stickyAuth: true,
+            sensitiveTransaction: true,
+          ),
+        );
+
+        if (isAuthenticated) {
+          _navegarHome();
+        }
+      } catch (e) {
+        _navegarHome();
+      }
     }
   }
 
