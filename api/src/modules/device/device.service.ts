@@ -3,10 +3,12 @@ import { PrismaService } from '../../infra/prisma/prisma.service';
 import { Device } from '../../models/device.model';
 import { DeviceStatus } from '../../enums/device-status.enum';
 import { MqttService } from '../../infra/mqtt/mqtt.service';
+import { DeviceGateway } from './device.gateway';
 
 @Injectable()
 export class DeviceService {
   constructor(
+    private readonly deviceGateway: DeviceGateway,
     private readonly mqttService: MqttService,
     private readonly prismaService: PrismaService,
   ) {
@@ -17,7 +19,12 @@ export class DeviceService {
           ? DeviceStatus.active
           : DeviceStatus.inactive;
 
-      await this.setStatusById(deviceId, status);
+      await this.prismaService.device.update({
+        where: { id: deviceId },
+        data: { status },
+      });
+
+      await this.deviceGateway.sendStatus(deviceId, status);
     });
   }
 
@@ -51,6 +58,8 @@ export class DeviceService {
       },
     });
 
+    await this.deviceGateway.sendStatus(deviceId, newStatus);
+
     return {
       ...toggledDevice,
       status: toggledDevice.status as DeviceStatus,
@@ -66,6 +75,8 @@ export class DeviceService {
       where: { id: deviceId },
       data: { status },
     });
+
+    await this.deviceGateway.sendStatus(deviceId, status);
 
     return {
       ...updatedDevice,
