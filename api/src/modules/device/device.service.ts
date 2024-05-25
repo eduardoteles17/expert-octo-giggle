@@ -37,46 +37,13 @@ export class DeviceService {
     }));
   }
 
-  async toggleById(deviceId: string): Promise<Device> {
-    const device = await this.prismaService.device.findUnique({
-      where: { id: deviceId },
-    });
-
-    const newStatus =
-      device.status === DeviceStatus.active
-        ? DeviceStatus.inactive
-        : DeviceStatus.active;
-
-    const message = newStatus === DeviceStatus.active ? 'ON' : 'OFF';
-
-    this.mqttService.publish(`cmnd/${deviceId}/POWER`, message);
-
-    const toggledDevice = await this.prismaService.device.update({
-      where: { id: deviceId },
-      data: {
-        status: newStatus,
-      },
-    });
-
-    return {
-      ...toggledDevice,
-      status: toggledDevice.status as DeviceStatus,
-    };
+  async toggleById(deviceId: string) {
+    this.mqttService.publish(`cmnd/${deviceId}/POWER`, 'TOGGLE');
   }
 
-  async setStatusById(deviceId: string, status: DeviceStatus): Promise<Device> {
+  async setStatusById(deviceId: string, status: DeviceStatus) {
     const message = status === DeviceStatus.active ? 'ON' : 'OFF';
 
     this.mqttService.publish(`cmnd/${deviceId}/POWER`, message);
-
-    const updatedDevice = await this.prismaService.device.update({
-      where: { id: deviceId },
-      data: { status },
-    });
-
-    return {
-      ...updatedDevice,
-      status: updatedDevice.status as DeviceStatus,
-    };
   }
 }
