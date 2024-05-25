@@ -4,7 +4,7 @@ const isProduction = bool.fromEnvironment('dart.vm.product');
 
 final socket = IO.io(
   isProduction
-      ? 'https://smart-lamp-api.eduardoteles.cloud'
+      ? 'https://smart-lamp-production.up.railway.app'
       : 'https://reindeer-absolute-escargot.ngrok-free.app',
   IO.OptionBuilder()
       .setTransports(['websocket'])
